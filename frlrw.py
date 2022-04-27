@@ -1,9 +1,9 @@
 from __future__ import print_function
 
-from pgd.utils_frl import *
-from pgd.pre_resnet import PreActResNet18
-from pgd.wide_resnet import WideResNet
-from pgd.data_loader import get_cifar10_loader
+from utils_frl import *
+from pre_resnet import PreActResNet18
+from wide_resnet import WideResNet
+from data_loader import get_cifar10_loader
 
 import os
 import argparse
@@ -24,7 +24,7 @@ def main(args):
 
     ## other layer optimizer
     optimizer = optim.SGD(h_net.parameters(), lr=0.001, momentum=0.9, weight_decay=5e-4)
-    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[40, 80, 250], gamma=0.1)
+    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[40, 80], gamma=0.1)
 
     ## attack parameters during test
     configs =  {
@@ -95,7 +95,7 @@ def main(args):
 if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--epoch', type=int, help='epoch number', default=120)
+    argparser.add_argument('--epoch', type=int, help='epoch number', default=80)
     argparser.add_argument('--batch_size', type=int, help='batch_size', default=128)
     argparser.add_argument('--seed', type=int, help='random seed', default=100)
     argparser.add_argument('--beta', help='trade off parameter', type = float, default=1.0)

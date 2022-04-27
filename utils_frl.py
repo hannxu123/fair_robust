@@ -240,7 +240,8 @@ def train_model(model, train_loader, optimizer, diff0, diff1, diff2, epoch, beta
         loss_bndy = torch.sum(loss_bndy_vec, 1)
 
         ## merge loss
-        loss = torch.sum(loss_natural * weight0 + beta * loss_bndy * weight1) / torch.sum(weight0 + weight1)        ## back propagates
+        loss = torch.sum(loss_natural * weight0)/ torch.sum(weight0)\
+               + beta * torch.sum(loss_bndy * weight1) / torch.sum(weight1)        ## back propagates
         loss.backward()
         optimizer.step()
 

@@ -41,48 +41,6 @@ def pgd_attack(model,
     return X_pgd
 
 
-def pgd_attack_frl(model,
-                  X,
-                  y,
-                  weight,
-                  epsilon,
-                  clip_max,
-                  clip_min,
-                  num_steps,
-                  step_size):
-
-    new_eps = (epsilon * weight).view(weight.shape[0], 1, 1, 1)
-
-    device = X.device
-    imageArray = X.detach().cpu().numpy()
-    X_random = np.random.uniform(-epsilon, epsilon, X.shape)
-    imageArray = np.clip(imageArray + X_random, 0, 1.0)
-
-    X_pgd = torch.tensor(imageArray).to(device).float()
-    X_pgd.requires_grad = True
-
-    for i in range(num_steps):
-
-        pred = model(X_pgd)
-        loss = nn.CrossEntropyLoss()(pred, y)
-        loss.backward()
-        eta = step_size * X_pgd.grad.data.sign()
-
-        X_pgd = X_pgd + eta
-        #eta = torch.clamp(X_pgd.data - X.data, -epsilon, epsilon)
-        eta = torch.min(torch.max(X_pgd - X.data, -1.0 * new_eps), new_eps)
-        X_pgd = X.data + eta
-        X_pgd = torch.clamp(X_pgd, clip_min, clip_max)
-        X_pgd = X_pgd.detach()
-        X_pgd.requires_grad_()
-        X_pgd.retain_grad()
-
-    return X_pgd
-
-
-
-
-
 def in_class(predict, label):
 
     probs = torch.zeros(10)
@@ -201,6 +159,7 @@ def trades_adv(model,
 
     # define KL-loss
     new_eps = (epsilon * weight).view(weight.shape[0], 1, 1, 1)
+    step_size = torch.max(new_eps) / 4
 
     criterion_kl = nn.KLDivLoss(size_average = False)
     model.eval()
@@ -246,7 +205,7 @@ def train_model(model, train_loader, optimizer, diff0, diff1, diff2, epoch, beta
         loss_bndy = torch.sum(loss_bndy_vec, 1)
 
         ## merge loss
-        loss = torch.sum(loss_natural * weight0 + beta * loss_bndy * weight1) / torch.sum(weight0 + weight1)        ## back propagates
+        loss = torch.sum(loss_natural * weight0)/ torch.sum(weight0)  + beta * torch.sum(loss_bndy * weight1) / torch.sum(weight1)        ## back propagates
         loss.backward()
         optimizer.step()
 
@@ -287,12 +246,6 @@ def frl_train(h_net, ds_train, ds_valid, optimizer, now_epoch, configs, configs1
     ## given langerangian multipliers, get each class's weight
     lmbda = torch.cat([lmbda0, lmbda1, lmbda2])
     diff0, diff1, diff2 = cost_sensitive(lmbda0, lmbda1, lmbda2)
-
-    print('..............................')
-    print('current lambda after update')
-    print(lmbda0)
-    print(lmbda1)
-    print(lmbda2)
 
     print('..............................')
     print('current weight')

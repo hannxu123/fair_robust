@@ -89,14 +89,7 @@ class Cifar10():
             img = self.transform_valid(img)
         return img, target
 
-
-
-
-
 def get_cifar10_loader(batch_size):
-
-
-    """Build and return data loader."""
 
     dataset1 = Cifar10(mode='train')
     dataset2 = Cifar10(mode='valid')
@@ -113,4 +106,5 @@ def get_cifar10_loader(batch_size):
     test_loader = DataLoader(dataset=dataset3,
                               batch_size=batch_size,
                               shuffle=True)
+
     return train_loader, valid_loader, test_loader
