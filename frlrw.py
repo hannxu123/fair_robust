@@ -18,7 +18,7 @@ def main(args):
     elif args.model == 'WRN28':
         h_net = WideResNet().cuda()
 
-    h_net.load_state_dict(torch.load('pgd/hot_start.pt'))
+    h_net.load_state_dict(torch.load('hot_start.pt'))
 
     ds_train, ds_valid, ds_test = get_cifar10_loader(batch_size=args.batch_size)
 
