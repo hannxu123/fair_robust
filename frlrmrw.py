@@ -88,7 +88,7 @@ if __name__ == '__main__':
     argparser.add_argument('--epoch', type=int, help='epoch number', default=40)
     argparser.add_argument('--batch_size', type=int, help='batch_size', default=128)
     argparser.add_argument('--seed', type=int, help='random seed', default=100)
-    argparser.add_argument('--beta', help='trade off parameter', type = float, default=2.0)
+    argparser.add_argument('--beta', help='trade off parameter', type = float, default=1.5)
     argparser.add_argument('--model', help='model structure', default='PreResNet18')
     argparser.add_argument('--bound0', type=float, help='fair constraints for clean error', default=0.07)
     argparser.add_argument('--bound1', type=float, help='fair constraints for bndy error', default=0.07)
